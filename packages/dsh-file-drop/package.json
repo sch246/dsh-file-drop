@@ -1,5 +1,5 @@
 {
-  "name": "@dsh-external/dsh-file-drop", "version": "0.1.0", "private": true, "type": "module",
+  "name": "@dsh-external/dsh-file-drop", "version": "0.1.0", "private": true, "type": "module", "license": "MIT",
   "description": "Optional native file-drop routing and Conversation adapter for DeepSeek Harness",
   "main": "./lib/index.js", "types": "./lib/types/index.d.ts",
   "exports": {
@@ -8,7 +8,7 @@
     "./types": { "types": "./lib/types/types.d.ts", "default": "./lib/types/types.js" },
     "./package.json": "./package.json"
   },
-  "files": ["lib", "cordis.patch.yml", "README.md"],
+  "files": ["lib", "cordis.patch.yml", "README.md", "LICENSE"],
   "dsh": { "bundle": { "patch": "./cordis.patch.yml" }, "client": { "platform": "web", "inject": [] } },
   "peerDependencies": { "@deepseek-ai/cordis": ">=4.0.0-rc <5" },
   "devDependencies": {
