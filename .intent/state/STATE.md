@@ -1,5 +1,11 @@
 # File drop installation and maintenance map
 
+## Workspace operation convention
+
+Use the [root operation table](../../README.md#workspace-operations) for `build`, `typecheck`, `setup`, `inspect` and `remove`. The repository root owns development tools, scripts and this intent package; installable artifacts live under `packages/`. Select `DSH_CHECKOUT`, and explicit `DSH_HOME`/`DSH_PROFILE` for profile operations. Setup and removal inspect unless passed `--install` or `--remove`; inspect never mutates. Preserve existing plugin transactions, Host ownership and separate service activation. Build/typecheck/test invoke prepared local Node tools without installing dependencies.
+
+Keep independent repository and package versions. Require compatible API ranges, not equal versions; optional cooperation is not a required dependency. Distribute MIT license text with each package and retain copyright attribution. Record selected installations, verification evidence and historical implementation gaps in [LOG](../logs/2026-09-07-standardized-workspace-operations.md); this map owns intended effects and reusable operations.
+
 ## Intended behavior
 
 One optional browser plugin routes native `Files` drags to the deepest registered live DOM region. A rejecting nested target blocks its ancestors. Only that target shows hover feedback and receives a dropped batch; files outside registered regions never enter Chat or a file manager. The provider may prevent browser file navigation outside targets while leaving text and internal-tab drags untouched. Registration removal, aborted drags and plugin disposal clear hover and owned listeners. Consumer callback failures reach its error handler, or the browser console when none is supplied.

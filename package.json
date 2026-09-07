@@ -8,7 +8,9 @@
     "build": "bash scripts/build.sh",
     "test": "bash scripts/test.sh",
     "setup": "bash scripts/setup.sh",
-    "remove": "bash scripts/remove.sh"
+    "remove": "bash scripts/remove.sh",
+    "inspect": "bash scripts/inspect.sh",
+    "typecheck": "bash scripts/typecheck.sh"
   },
   "devDependencies": {
     "typescript": "5.9.3",
@@ -19,5 +21,6 @@
     "@types/react-dom": "^18.3.0",
     "@types/node": "^24.3.0",
     "lightningcss": "^1.30.1"
-  }
+  },
+  "license": "MIT"
 }

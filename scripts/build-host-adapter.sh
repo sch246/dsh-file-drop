@@ -7,8 +7,8 @@ if [ ! -f "$CHECKOUT/packages/client/ui-attachment/src/DropOverlay.tsx" ]; then
   done
 fi
 for package in ui-conversation ui-attachment; do
-  node "$TOOL_ROOT/typescript/bin/tsc" -p "$CHECKOUT/packages/client/$package/tsconfig.json" --pretty false
-  (cd "$CHECKOUT/packages/client/$package" && node "$TOOL_ROOT/tsdown/dist/run.mjs" --config tsdown.config.ts)
+  node "$CHECKOUT/node_modules/typescript/bin/tsc" -p "$CHECKOUT/packages/client/$package/tsconfig.json" --pretty false
+  (cd "$CHECKOUT/packages/client/$package" && node "$CHECKOUT/node_modules/tsdown/dist/run.mjs" --config tsdown.config.ts)
 done
 (cd "$CHECKOUT" && node --import tsx/esm scripts/gen-client-catalog.ts)
-(cd "$CHECKOUT/packages/extensions/cordis-client-runner" && node "$TOOL_ROOT/tsdown/dist/run.mjs" --config tsdown.config.ts)
+(cd "$CHECKOUT/packages/extensions/cordis-client-runner" && node "$CHECKOUT/node_modules/tsdown/dist/run.mjs" --config tsdown.config.ts)
