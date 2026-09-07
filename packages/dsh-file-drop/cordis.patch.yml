@@ -1,0 +1,3 @@
+- insert:
+    - id: dsh-file-drop
+      name: '@dsh-external/dsh-file-drop'

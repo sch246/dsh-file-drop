@@ -1,0 +1,51 @@
+/* Decoration leaves native drag targeting on the registered region. */
+.dsh-file-drop-mask {
+  position: absolute;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  background-color: var(--dsw-alias-bg-mask-drop);
+  backdrop-filter: blur(10px);
+  animation: dsh-file-drop-fade-in 160ms ease-out;
+}
+
+@keyframes dsh-file-drop-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dsh-file-drop-mask {
+    animation: none;
+  }
+}
+
+.dsh-file-drop-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: -3%;
+  padding: 0 40px;
+  color: var(--dsw-alias-label-primary);
+  text-align: center;
+}
+
+.dsh-file-drop-illustration {
+  width: 115px;
+  height: 84px;
+}
+
+.dsh-file-drop-title {
+  margin-top: 16px;
+  font: var(--dsw-font-l-20);
+}
+
+.dsh-file-drop-desc {
+  margin-top: 16px;
+  font: var(--dsw-font-s-14);
+  color: var(--dsw-alias-label-tertiary);
+  white-space: pre-wrap;
+}

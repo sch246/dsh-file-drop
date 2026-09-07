@@ -1,0 +1,10 @@
+{
+  "extends": "../../harness/tsconfig.base.client.json",
+  "compilerOptions": { "rootDir": "src", "outDir": "lib/types", "tsBuildInfoFile": "lib/client.tsbuildinfo", "noEmitOnError": true },
+  "include": ["src/client", "src/types.ts"],
+  "references": [
+    { "path": "../../harness/vendor/cordis" },
+    { "path": "../../harness/packages/client/ui-conversation" },
+    { "path": "../../harness/packages/client/ui-renderer" }
+  ]
+}

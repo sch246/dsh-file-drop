@@ -1,0 +1,828 @@
+--- a/packages/client/ui-attachment/README.md
++++ b/packages/client/ui-attachment/README.md
+@@ -1,5 +1,5 @@
+ ---
+-description: "Attachment presentation for the conversation UI: draft-image rail, document drop target, history-image gallery, and original-image lightbox; for users and maintainers of the Web attachment experience."
++description: "Attachment presentation for the conversation UI: draft-image rail, history-image gallery, and original-image lightbox; for users and maintainers of the Web attachment experience."
+ kind: "package-reference"
+ ---
+ 
+@@ -9,7 +9,7 @@
+ 
+ ## Summary
+ 
+-This package renders everything the conversation UI shows about attachments: pending draft images under the composer, a full-viewport drop invitation, durable images in Chat and Trajectory, and a lightbox for the original image. It is a pure presentation layer — attachment data, image loading, and callbacks come from the conversation package through declared slots. Choose it for the DeepSeek Chat-style image experience; non-image files have no surface here.
++This package renders everything the conversation UI shows about attachments: pending draft images under the composer, durable images in Chat and Trajectory, and a lightbox for the original image. It is a pure presentation layer — attachment data, image loading, and callbacks come from the conversation package through declared slots. Choose it for the DeepSeek Chat-style image experience; non-image files have no surface here.
+ 
+ ## Table of Contents
+ 
+@@ -25,7 +25,7 @@
+ <a id="use-this-package"></a>
+ ## Use this package
+ 
+-Mount this plugin alongside [`ui-conversation`](../ui-conversation/README.md); it waits for the conversation package's slot declarations and registers its surfaces into them. Users then see the draft-image rail with per-image remove and click-to-open, the drop overlay with its limits line, message images sized by count, and the Escape/mask/close lightbox.
++Mount this plugin alongside [`ui-conversation`](../ui-conversation/README.md); it waits for the conversation package's slot declarations and registers its surfaces into them. Users then see the draft-image rail with per-image remove and click-to-open, message images sized by count, and the Escape/mask/close lightbox.
+ 
+ ### Draft images
+ 
+@@ -35,9 +35,7 @@
+ 
+ A message's lone image renders at 240px on its longer edge (aspect clamped to [0.25, 4], never upscaled); images among several render as fixed 64px squares. A loaded image opens the document-level lightbox on click; a failed load shows a retry control instead. The lightbox closes on Escape, a mask press, or its close control, and restores focus to its opener.
+ 
+-### Drop overlay
+-
+-While a file drag is over the page, the full-viewport overlay announces the drop: illustration, title, and a limits line when drops are accepted. The overlay only shows state — the owner's document-level listeners decide accept or reject.
++Native file-drop routing and its invitation belong to the optional [file-drop plugin](https://github.com/sch246/dsh-file-drop). This renderer owns no native drag listeners.
+ 
+ -----
+ 
+@@ -47,16 +45,15 @@
+ <details>
+ <summary>Implementation internals — click to expand</summary>
+ 
+-The plugin waits for `conversation.input.attachments`, `conversation.message.images`, and `conversation.trajectory.images` through `ctx.slots.inject`. It then registers the composer rail, document drop target, shared history gallery for Chat and Trajectory, and original-image lightbox. The presentation components are pure props: the conversation slot owner supplies attachment data, image loading, callbacks, and the locale translator; the package entry exports no components.
++The plugin waits for `conversation.input.attachments`, `conversation.message.images`, and `conversation.trajectory.images` through `ctx.slots.inject`. It then registers the composer rail, shared history gallery for Chat and Trajectory, and original-image lightbox. The presentation components are pure props: the conversation slot owner supplies attachment data, image loading, callbacks and the locale translator; the package entry exports no components.
+ 
+ | File | Role |
+ |---|---|
+-| [`src/client/ComposerAttachments.tsx`](src/client/ComposerAttachments.tsx) | Draft-image rail + drop overlay assembly |
++| [`src/client/ComposerAttachments.tsx`](src/client/ComposerAttachments.tsx) | Draft-image rail + preview assembly |
+ | [`src/AttachmentRail.tsx`](src/AttachmentRail.tsx) | Scrolling thumbnail rail, wheel translation, edge arrows |
+ | [`src/client/MessageImages.tsx`](src/client/MessageImages.tsx) | Per-message gallery + lightbox assembly |
+ | [`src/MessageImage.tsx`](src/MessageImage.tsx) | Single image sizing, load/retry, click-to-open; local submission-echo previews render their object URL directly |
+ | [`src/ImageLightbox.tsx`](src/ImageLightbox.tsx) | Document-level modal preview over the shared mask |
+-| [`src/DropOverlay.tsx`](src/DropOverlay.tsx) | Pointer-inert drag invitation portal |
+ 
+ </details>
+ 
+--- a/packages/client/ui-attachment/README.zh.md
++++ b/packages/client/ui-attachment/README.zh.md
+@@ -1,5 +1,5 @@
+ ---
+-description: "对话 UI 的附件呈现：草稿图片栏、文档拖放目标、历史图片画廊与原图灯箱；供 Web 附件体验的用户与维护者阅读。"
++description: "对话 UI 的附件呈现：草稿图片栏、历史图片画廊与原图灯箱；供 Web 附件体验的用户与维护者阅读。"
+ kind: "package-reference"
+ ---
+ 
+@@ -9,7 +9,7 @@
+ 
+ ## 概述
+ 
+-本包渲染对话 UI 中与附件相关的一切：composer 下的待发送草稿图片、全视口拖放邀请层、Chat 与 Trajectory 中的持久图片，以及查看原图的灯箱。它是纯呈现层——附件数据、图片加载与回调都经声明槽位来自 conversation 包。需要 DeepSeek Chat 风格的图片体验时选择它；非图片文件在此没有任何表面。
++本包渲染对话 UI 中与附件相关的一切：composer 下的待发送草稿图片、Chat 与 Trajectory 中的持久图片，以及查看原图的灯箱。它是纯呈现层——附件数据、图片加载与回调都经声明槽位来自 conversation 包。需要 DeepSeek Chat 风格的图片体验时选择它；非图片文件在此没有任何表面。
+ 
+ ## 目录
+ 
+@@ -25,7 +25,7 @@
+ <a id="use-this-package"></a>
+ ## 使用本包
+ 
+-与 [`ui-conversation`](../ui-conversation/README.zh.md) 一起挂载本插件；它等待 conversation 包的槽位声明，并把自身表面注册进这些槽位。用户随即看到：带逐图删除与点击打开的草稿图片栏、带上限说明的拖放遮罩、按数量定尺寸的消息图片，以及支持 Escape／遮罩／关闭按钮的灯箱。
++与 [`ui-conversation`](../ui-conversation/README.zh.md) 一起挂载本插件；它等待 conversation 包的槽位声明，并把自身表面注册进这些槽位。用户随即看到：带逐图删除与点击打开的草稿图片栏、按数量定尺寸的消息图片，以及支持 Escape／遮罩／关闭按钮的灯箱。
+ 
+ ### 草稿图片
+ 
+@@ -35,9 +35,7 @@
+ 
+ 一条消息仅有的一张图按长边 240px 渲染（宽高比钳制在 [0.25, 4]，从不放大）；多图中的一张渲染为固定 64px 方块。加载完成的图片单击打开文档级灯箱；加载失败则显示重试控件。灯箱按 Escape、按下遮罩或点关闭按钮关闭，并把焦点还给打开者。
+ 
+-### 拖放遮罩
+-
+-文件拖拽悬停页面时，全视口遮罩宣布可拖放：插画、标题，接受拖放时再加一行上限说明。遮罩只呈现状态——接受或拒绝由持有方的 document 级监听器决定。
++原生文件拖放路由与邀请层属于可选的 [file-drop 插件](https://github.com/sch246/dsh-file-drop)。附件呈现器不注册原生拖拽监听器。
+ 
+ -----
+ 
+@@ -47,16 +45,15 @@
+ <details>
+ <summary>实现细节——点击展开</summary>
+ 
+-插件通过 `ctx.slots.inject` 等待 `conversation.input.attachments`、`conversation.message.images` 与 `conversation.trajectory.images`。随后它注册 composer rail、文档拖放目标、供 Chat 和 Trajectory 共用的历史图片 gallery，以及原图灯箱。呈现组件保持纯 props：conversation 槽位持有方提供附件数据、图片加载、回调与语言包翻译器；包入口不导出任何组件。
++插件通过 `ctx.slots.inject` 等待 `conversation.input.attachments`、`conversation.message.images` 与 `conversation.trajectory.images`。随后它注册 composer rail、供 Chat 和 Trajectory 共用的历史图片 gallery，以及原图灯箱。呈现组件保持纯 props：conversation 槽位持有方提供附件数据、图片加载、回调与语言包翻译器；包入口不导出任何组件。
+ 
+ | 文件 | 职责 |
+ |---|---|
+-| [`src/client/ComposerAttachments.tsx`](src/client/ComposerAttachments.tsx) | 草稿图片栏＋拖放遮罩的组装 |
++| [`src/client/ComposerAttachments.tsx`](src/client/ComposerAttachments.tsx) | 草稿图片栏＋预览的组装 |
+ | [`src/AttachmentRail.tsx`](src/AttachmentRail.tsx) | 滚动缩略图栏、滚轮转换、边缘箭头 |
+ | [`src/client/MessageImages.tsx`](src/client/MessageImages.tsx) | 每消息画廊＋灯箱的组装 |
+ | [`src/MessageImage.tsx`](src/MessageImage.tsx) | 单图尺寸、加载／重试、点击打开；本地提交回显预览直接显示其 object URL |
+ | [`src/ImageLightbox.tsx`](src/ImageLightbox.tsx) | 铺在共享遮罩上的文档级模态预览 |
+-| [`src/DropOverlay.tsx`](src/DropOverlay.tsx) | 不接收指针事件的拖拽邀请 portal |
+ 
+ </details>
+ 
+--- a/packages/client/ui-attachment/src/DropOverlay.module.css
++++ /dev/null
+@@ -1,52 +0,0 @@
+-/* Drag events must keep reaching the page so the owner's enter/leave count
+-   stays balanced. */
+-.mask {
+-  position: fixed;
+-  inset: 0;
+-  z-index: 1000;
+-  display: flex;
+-  align-items: center;
+-  justify-content: center;
+-  pointer-events: none;
+-  background-color: var(--dsw-alias-bg-mask-drop);
+-  backdrop-filter: blur(10px);
+-  animation: fade-in 160ms ease-out;
+-}
+-
+-@keyframes fade-in {
+-  from { opacity: 0; }
+-  to { opacity: 1; }
+-}
+-
+-@media (prefers-reduced-motion: reduce) {
+-  .mask {
+-    animation: none;
+-  }
+-}
+-
+-.wrap {
+-  display: flex;
+-  flex-direction: column;
+-  align-items: center;
+-  margin-top: -3%;
+-  padding: 0 40px;
+-  color: var(--dsw-alias-label-primary);
+-  text-align: center;
+-}
+-
+-.illustration {
+-  width: 115px;
+-  height: 84px;
+-}
+-
+-.title {
+-  margin-top: 16px;
+-  font: var(--dsw-font-l-20);
+-}
+-
+-.desc {
+-  margin-top: 16px;
+-  font: var(--dsw-font-s-14);
+-  color: var(--dsw-alias-label-tertiary);
+-  white-space: pre-wrap;
+-}
+--- a/packages/client/ui-attachment/src/DropOverlay.tsx
++++ /dev/null
+@@ -1,77 +0,0 @@
+-import { createPortal } from 'react-dom'
+-import css from './DropOverlay.module.css'
+-
+-/** Drop-overlay strings the owner resolves from its own locale namespace. */
+-export interface DropOverlayLabels {
+-  /** Headline inviting the drop, or naming why it is unavailable. */
+-  title: string
+-  /** Limits line under the title; shown only while drops are accepted. */
+-  desc?: string | undefined
+-}
+-
+-/**
+- * Full-viewport invitation shown while a file drag is over the page
+- * (DeepSeek Chat's DragMask). Decoration only: `pointer-events: none` keeps
+- * drag targeting on the page below, so the owner's document-level listeners
+- * keep an accurate enter/leave count and own accept/reject. Rendered through
+- * a body portal for the same transformed-ancestor reason as the lightbox.
+- *
+- * @param props.disabled - drops are currently refused; renders the blocked
+- * illustration and drops the desc line.
+- * @param props.labels - resolved title and limits strings.
+- * @returns the overlay layer.
+- */
+-export function DropOverlay({ disabled, labels }: {
+-  disabled: boolean
+-  labels: DropOverlayLabels
+-}) {
+-  return createPortal(
+-    <div className={css.mask} role="status">
+-      <div className={css.wrap}>
+-        <div className={css.illustration} aria-hidden="true">
+-          {disabled ? <UploadDisabledIllustration /> : <UploadIllustration />}
+-        </div>
+-        <div className={css.title}>{labels.title}</div>
+-        {!disabled && labels.desc !== undefined && <div className={css.desc}>{labels.desc}</div>}
+-      </div>
+-    </div>,
+-    document.body,
+-  )
+-}
+-
+-/** Tilted photo-and-note cards (DeepSeek Chat upload illustration). */
+-const UploadIllustration = () => (
+-  <svg width="115" height="84" viewBox="0 0 115 84" fill="none" xmlns="http://www.w3.org/2000/svg">
+-    <g clipPath="url(#dshDropOverlayClip)">
+-      <rect y="17.0742" width="44.1832" height="43.6431" rx="12" transform="rotate(-22.7338 0 17.0742)" fill="#9CE5ED" />
+-      <rect x="73.4043" y="8.54297" width="43.7267" height="50.5284" rx="8" transform="rotate(17.403 73.4043 8.54297)" fill="#679EFE" />
+-      <path d="M30.4917 28.1369L40.8865 33.4564L37.2232 34.9524L29.5302 31.0159L26.7919 39.2122L23.1285 40.7082L26.8287 29.6338L16.8967 24.5516L20.5601 23.0556L27.7902 26.7549L30.3639 19.052L34.0273 17.556L30.4917 28.1369Z" fill="white" />
+-      <path d="M77.5088 26.3047L101.057 33.7966" stroke="white" strokeWidth="3" />
+-      <path d="M72.2646 42.7871L86.3938 47.2823" stroke="white" strokeWidth="3" />
+-      <path d="M74.8867 34.5469L98.4353 42.0388" stroke="white" strokeWidth="3" />
+-      <rect x="31.583" y="38.6641" width="44.9157" height="44.3666" rx="12" transform="rotate(-0.134233 31.583 38.6641)" fill="#3964FE" />
+-      <path d="M38.9521 73.0337C39.6129 71.7086 41.7113 66.0937 43.5113 61.1663C44.1607 59.3885 46.7484 59.3923 47.4591 61.1465C48.9728 64.8828 50.7969 68.6922 51.9988 69.1925C54.2946 70.1482 57.9854 59.3573 68.0064 70.1801" stroke="white" strokeWidth="3" />
+-      <circle cx="60.6157" cy="52.247" r="4.38794" transform="rotate(22.5996 60.6157 52.247)" fill="white" />
+-    </g>
+-    <defs>
+-      <clipPath id="dshDropOverlayClip">
+-        <rect width="115" height="84" fill="white" />
+-      </clipPath>
+-    </defs>
+-  </svg>
+-)
+-
+-/** Greyed cards with a blocked badge (DeepSeek Chat disabled illustration). */
+-const UploadDisabledIllustration = () => (
+-  <svg width="115" height="84" viewBox="0 0 115 84" fill="none" xmlns="http://www.w3.org/2000/svg">
+-    <path d="M29.6829 4.63701L11.0677 12.4368C4.95519 14.998 2.07624 22.0294 4.6374 28.1419L12.2285 46.259C14.7896 52.3715 21.8211 55.2505 27.9336 52.6893L46.5488 44.8895C52.6613 42.3283 55.5403 35.2969 52.9791 29.1844L45.388 11.0673C42.8269 4.9548 35.7954 2.07585 29.6829 4.63701Z" fill="#979DA6" />
+-    <path d="M30.4915 28.1375L40.8863 33.4569L37.223 34.9529L29.53 31.0165L26.7917 39.2128L23.1283 40.7088L26.8285 29.6344L16.8965 24.5522L20.5599 23.0562L27.79 26.7555L30.3637 19.0526L34.0271 17.5566L30.4915 28.1375Z" fill="white" />
+-    <path d="M107.496 19.2285L81.0381 10.9357C76.8221 9.61423 72.333 11.9607 71.0116 16.1768L60.6844 49.1246C59.363 53.3406 61.7095 57.8297 65.9255 59.1511L92.383 67.4439C96.599 68.7654 101.088 66.4189 102.41 62.2029L112.737 29.255C114.058 25.039 111.712 20.55 107.496 19.2285Z" fill="#979DA6" />
+-    <path d="M77.5088 26.3047L101.057 33.7967" stroke="white" strokeWidth="3" />
+-    <path d="M72.2646 42.7871L86.3938 47.2823" stroke="white" strokeWidth="3" />
+-    <path d="M74.8867 34.5469L98.4353 42.0388" stroke="white" strokeWidth="3" />
+-    <path d="M66.5798 30.1418L41.481 30.2006C33.5281 30.2193 27.0962 36.6815 27.1148 44.6343L27.172 69.0742C27.1907 77.0271 33.6529 83.459 41.6057 83.4404L66.7045 83.3816C74.6574 83.363 81.0894 76.9008 81.0707 68.9479L81.0135 44.5081C80.9949 36.5552 74.5327 30.1232 66.5798 30.1418Z" fill="#F59E0B" />
+-    <path d="M54 70.7969C61.732 70.7969 68 64.5289 68 56.7969C68 49.0649 61.732 42.7969 54 42.7969C46.268 42.7969 40 49.0649 40 56.7969C40 64.5289 46.268 70.7969 54 70.7969Z" stroke="white" strokeWidth="3.5" />
+-    <path d="M44 46.7969L64 66.7969" stroke="white" strokeWidth="3.5" strokeLinecap="round" />
+-  </svg>
+-)
+--- a/packages/client/ui-attachment/src/client/ComposerAttachments.tsx
++++ b/packages/client/ui-attachment/src/client/ComposerAttachments.tsx
+@@ -1,12 +1,11 @@
+-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
++import { useCallback, useEffect, useMemo, useState } from 'react'
+ import type {
+   ComposerAttachment, ComposerAttachmentsProps,
+ } from '@deepseek-ai/dsh-client-ui-conversation/client'
+ import { AttachmentRail } from '../AttachmentRail.tsx'
+ import type { AttachmentRailItem } from '../AttachmentRail.tsx'
+-import { DropOverlay } from '../DropOverlay.tsx'
+ import { ImageLightbox } from '../ImageLightbox.tsx'
+-import { attachmentRailLabels, dropOverlayLabels, lightboxLabels } from './labels.ts'
++import { attachmentRailLabels, lightboxLabels } from './labels.ts'
+ import css from './ComposerAttachments.module.css'
+ 
+ /** Rail item retaining its browser-owned attachment for callbacks. */
+@@ -14,69 +13,16 @@
+   attachment: ComposerAttachment
+ }
+ 
+-/** Draft-image rail, document drop target, and original-image preview slot entry. */
++/** Draft-image rail and original-image preview slot entry. */
+ export function ComposerAttachments({
+-  attachments, canAcceptDrop, onAddImages, onRemoveImage, dropLimits, t,
++  attachments, onRemoveImage, t,
+ }: ComposerAttachmentsProps) {
+   const [preview, setPreview] = useState<ComposerAttachment | null>(null)
+-  const [dragActive, setDragActive] = useState(false)
+-  const dragDepth = useRef(0)
+   const closePreview = useCallback(() => { setPreview(null) }, [])
+ 
+   useEffect(() => {
+     if (preview !== null && !attachments.some(attachment => attachment.id === preview.id)) setPreview(null)
+   }, [attachments, preview])
+-
+-  useEffect(() => {
+-    const fileTransfer = (event: globalThis.DragEvent): DataTransfer | null => {
+-      const dataTransfer = event.dataTransfer
+-      if (dataTransfer === null || !dataTransfer.types.includes('Files')) return null
+-      return dataTransfer
+-    }
+-    const reset = (): void => {
+-      dragDepth.current = 0
+-      setDragActive(false)
+-    }
+-    const onDragEnter = (event: globalThis.DragEvent): void => {
+-      if (fileTransfer(event) === null) return
+-      event.preventDefault()
+-      dragDepth.current += 1
+-      setDragActive(true)
+-    }
+-    const onDragOver = (event: globalThis.DragEvent): void => {
+-      const dataTransfer = fileTransfer(event)
+-      if (dataTransfer === null) return
+-      event.preventDefault()
+-      dataTransfer.dropEffect = canAcceptDrop ? 'copy' : 'none'
+-    }
+-    const onDragLeave = (event: globalThis.DragEvent): void => {
+-      if (fileTransfer(event) === null) return
+-      dragDepth.current = Math.max(0, dragDepth.current - 1)
+-      if (dragDepth.current === 0) setDragActive(false)
+-      const leftViewport = event.clientX <= 0 || event.clientY <= 0
+-        || event.clientX >= window.innerWidth || event.clientY >= window.innerHeight
+-      if ((event.target === document.documentElement || event.target === document.body) && leftViewport) reset()
+-    }
+-    const onDrop = (event: globalThis.DragEvent): void => {
+-      const dataTransfer = fileTransfer(event)
+-      if (dataTransfer === null) return
+-      event.preventDefault()
+-      reset()
+-      if (canAcceptDrop) onAddImages([...dataTransfer.files])
+-    }
+-    document.addEventListener('dragenter', onDragEnter)
+-    document.addEventListener('dragover', onDragOver)
+-    document.addEventListener('dragleave', onDragLeave)
+-    document.addEventListener('drop', onDrop)
+-    window.addEventListener('dragend', reset)
+-    return () => {
+-      document.removeEventListener('dragenter', onDragEnter)
+-      document.removeEventListener('dragover', onDragOver)
+-      document.removeEventListener('dragleave', onDragLeave)
+-      document.removeEventListener('drop', onDrop)
+-      window.removeEventListener('dragend', reset)
+-    }
+-  }, [canAcceptDrop, onAddImages])
+ 
+   const railItems = useMemo<ComposerRailItem[]>(() => attachments.map(attachment => ({
+     id: attachment.id,
+@@ -88,12 +34,6 @@
+ 
+   return (
+     <>
+-      {dragActive && (
+-        <DropOverlay
+-          disabled={!canAcceptDrop}
+-          labels={dropOverlayLabels(t, canAcceptDrop, dropLimits)}
+-        />
+-      )}
+       {railItems.length > 0 && (
+         <div className={css.rail}>
+           <AttachmentRail
+--- a/packages/client/ui-attachment/src/client/labels.ts
++++ b/packages/client/ui-attachment/src/client/labels.ts
+@@ -1,6 +1,5 @@
+ import type { TranslateNS } from '@deepseek-ai/dsh-client-ui-slots'
+ import type { AttachmentRailLabels } from '../AttachmentRail.tsx'
+-import type { DropOverlayLabels } from '../DropOverlay.tsx'
+ import type { ImageLightboxLabels } from '../ImageLightbox.tsx'
+ import type { MessageImageLabels } from '../MessageImage.tsx'
+ 
+@@ -30,25 +29,6 @@
+ }
+ 
+ /**
+- * Resolve the document-level drop invitation and its optional limits line.
+- * @param t - conversation namespace translator.
+- * @param accepting - whether the composer can accept dropped files.
+- * @param limits - optional translated count and size values.
+- * @returns translated drop-overlay labels.
+- */
+-export function dropOverlayLabels(
+-  t: TranslateNS<'conversation'>,
+-  accepting: boolean,
+-  limits?: { readonly count: number; readonly size: string },
+-): DropOverlayLabels {
+-  if (!accepting) return { title: t('image.dropBlocked') }
+-  return {
+-    title: t('image.dropTitle'),
+-    desc: limits === undefined ? undefined : t('image.dropDesc', limits),
+-  }
+-}
+-
+-/**
+  * Resolve draft-image rail strings from the conversation namespace.
+  * @param t - conversation namespace translator.
+  * @returns translated attachment-rail labels.
+--- a/packages/client/ui-attachment/tests/composer-attachments.client.spec.tsx
++++ b/packages/client/ui-attachment/tests/composer-attachments.client.spec.tsx
+@@ -29,17 +29,10 @@
+     'image.openOriginal': '查看原图',
+     'image.scrollLeft': '向左滚动图片',
+     'image.scrollRight': '向右滚动图片',
+-    'image.dropBlocked': '当前无法添加图片',
+-    'image.dropTitle': '图片拖动到此处即可添加',
+   }
+   if (key === 'image.remove') {
+     const name = params?.name
+     return `移除图片 ${typeof name === 'string' ? name : ''}`
+-  }
+-  if (key === 'image.dropDesc') {
+-    const count = params?.count
+-    const size = params?.size
+-    return `最多 ${typeof count === 'number' ? String(count) : ''} 张，每张 ${typeof size === 'string' ? size : ''}`
+   }
+   return messages[key] ?? key
+ }) as ComposerAttachmentsProps['t']
+@@ -56,8 +49,6 @@
+ function props(overrides: Partial<ComposerAttachmentsOwnerProps> = {}): ComposerAttachmentsProps {
+   return {
+     attachments: [],
+-    canAcceptDrop: true,
+-    onAddImages: () => {},
+     onRemoveImage: () => {},
+     t,
+     ...overrides,
+@@ -65,72 +56,6 @@
+ }
+ 
+ describe('ComposerAttachments', () => {
+-  it('accepts file drops anywhere on the document and keeps non-file drags native', () => {
+-    const onAddImages = vi.fn()
+-    const view = render(<ComposerAttachments {...props({
+-      onAddImages,
+-      dropLimits: { count: 20, size: '5MB' },
+-    })} />)
+-
+-    expect(fireEvent.dragEnter(document.body, { dataTransfer: null })).toBe(true)
+-    const textTransfer = { types: ['text/plain'], files: [], dropEffect: 'none' }
+-    expect(fireEvent.dragEnter(document.body, { dataTransfer: textTransfer })).toBe(true)
+-    expect(fireEvent.dragOver(document.body, { dataTransfer: textTransfer })).toBe(true)
+-    expect(fireEvent.drop(document.body, { dataTransfer: textTransfer })).toBe(true)
+-    expect(view.queryByRole('status')).toBeNull()
+-
+-    const image = attachment('dropped').file
+-    const dataTransfer = { types: ['Files'], files: [image], dropEffect: 'none' }
+-    expect(fireEvent.dragEnter(document.body, { dataTransfer })).toBe(false)
+-    expect(view.getByRole('status').textContent).toContain('图片拖动到此处即可添加')
+-    expect(view.getByRole('status').textContent).toContain('最多 20 张，每张 5MB')
+-    expect(fireEvent.dragOver(document.body, { dataTransfer })).toBe(false)
+-    expect(dataTransfer.dropEffect).toBe('copy')
+-    expect(fireEvent.drop(document.body, { dataTransfer })).toBe(false)
+-    expect(onAddImages).toHaveBeenCalledWith([image])
+-    expect(view.queryByRole('status')).toBeNull()
+-  })
+-
+-  it('tracks nested file drags and clears an aborted drag', () => {
+-    const view = render(<ComposerAttachments {...props()} />)
+-    const dataTransfer = { types: ['Files'], files: [], dropEffect: 'none' }
+-    fireEvent.dragLeave(document.body, {
+-      dataTransfer: { types: ['text/plain'], files: [], dropEffect: 'none' },
+-    })
+-    fireEvent.dragEnter(document.body, { dataTransfer })
+-    fireEvent.dragEnter(document.body, { dataTransfer })
+-    fireEvent.dragLeave(document.body, { dataTransfer, clientX: 5, clientY: 5 })
+-    expect(view.getByRole('status')).toBeTruthy()
+-    fireEvent.dragLeave(document.body, { dataTransfer, clientX: 5, clientY: 5 })
+-    expect(view.queryByRole('status')).toBeNull()
+-    fireEvent.dragEnter(document.documentElement, { dataTransfer })
+-    const leftViewport = new Event('dragleave', { bubbles: true, cancelable: true })
+-    Object.defineProperties(leftViewport, {
+-      dataTransfer: { value: dataTransfer },
+-      clientX: { value: -1 },
+-      clientY: { value: 5 },
+-    })
+-    fireEvent(document.documentElement, leftViewport)
+-    expect(view.queryByRole('status')).toBeNull()
+-    fireEvent.dragEnter(document.body, { dataTransfer })
+-    fireEvent.dragEnd(window, { dataTransfer })
+-    expect(view.queryByRole('status')).toBeNull()
+-  })
+-
+-  it('shows a blocked drop without forwarding its files', () => {
+-    const onAddImages = vi.fn()
+-    const view = render(<ComposerAttachments {...props({ canAcceptDrop: false, onAddImages })} />)
+-    const image = attachment('blocked').file
+-    const dataTransfer = { types: ['Files'], files: [image], dropEffect: 'copy' }
+-    fireEvent.dragEnter(document.body, { dataTransfer })
+-    expect(view.getByRole('status').textContent).toBe('当前无法添加图片')
+-    fireEvent.dragOver(document.body, { dataTransfer })
+-    expect(dataTransfer.dropEffect).toBe('none')
+-    fireEvent.drop(document.body, { dataTransfer })
+-    expect(onAddImages).not.toHaveBeenCalled()
+-    expect(view.queryByRole('status')).toBeNull()
+-  })
+-
+   it('routes rail removal and closes previews on Escape or attachment removal', () => {
+     const onRemoveImage = vi.fn()
+     const image = attachment('draft-1', 'pixel.png')
+--- a/packages/client/ui-attachment/tests/drop-overlay.client.spec.tsx
++++ /dev/null
+@@ -1,38 +0,0 @@
+-// @vitest-environment jsdom
+-
+-import { afterEach, describe, expect, it } from 'vitest'
+-import { cleanup, render } from '@testing-library/react'
+-import { DropOverlay } from '../src/DropOverlay.tsx'
+-
+-afterEach(cleanup)
+-
+-describe('DropOverlay', () => {
+-  it('portals the invitation with its title and limits desc to the body', () => {
+-    const view = render(
+-      <DropOverlay disabled={false} labels={{ title: '图片拖动到此处即可添加', desc: '最多 20 张，每张 5MB' }} />,
+-    )
+-    const overlay = view.getByRole('status')
+-    expect(overlay.parentElement).toBe(document.body)
+-    expect(overlay.textContent).toContain('图片拖动到此处即可添加')
+-    expect(overlay.textContent).toContain('最多 20 张，每张 5MB')
+-  })
+-
+-  it('omits the desc line when none is resolved', () => {
+-    const view = render(<DropOverlay disabled={false} labels={{ title: '图片拖动到此处即可添加' }} />)
+-    expect(view.getByRole('status').textContent).toBe('图片拖动到此处即可添加')
+-  })
+-
+-  it('drops the desc and switches the illustration while disabled', () => {
+-    const enabled = render(
+-      <DropOverlay disabled={false} labels={{ title: '拖入', desc: '限制' }} />,
+-    )
+-    const enabledSvg = enabled.getByRole('status').querySelector('svg')!.innerHTML
+-    enabled.unmount()
+-    const disabled = render(
+-      <DropOverlay disabled labels={{ title: '当前无法添加图片', desc: '限制' }} />,
+-    )
+-    const overlay = disabled.getByRole('status')
+-    expect(overlay.textContent).toBe('当前无法添加图片')
+-    expect(overlay.querySelector('svg')!.innerHTML).not.toBe(enabledSvg)
+-  })
+-})
+--- a/packages/client/ui-conversation/README.md
++++ b/packages/client/ui-conversation/README.md
+@@ -43,6 +43,8 @@
+ Default sends commit optimistically: Enter clears the draft, occurrence table, and undo history in the same transaction, keeps the composer in `plain`, and runs the send as a detached attempt, so typing and further sends continue during the flight. `sendSession` registers a Session submission echo (`session.beginSubmission`) before serializing, yields one paint so the echo renders on the click's own frame, and encodes images through the browser's native `FileReader` data-URL path. Concurrent failures are restored together in submission order until the user edits the restored content; command submissions keep the frozen `submitting` phase. Detached attempts retain their image ids through admission and Session scope disposal. When an echo retires as observed, the durable image cache exposes its preview immediately, fetches the admitted attachment, replaces the preview with the canonical URL, and revokes each URL after its use ends. Direct subagent continuations skip local echoes because their transport does not preserve the browser request id.
+ 
+ While a normal composer is running, its primary pointer action remains Stop when the draft is empty or input is unavailable. Actionable text or attachments switch the same seat to Queue Send; clearing or successfully submitting the draft restores Stop. The busy-Enter setting continues to select the Queue or Steer keyboard action. Continuable subagents keep separate Send and Stop actions ([decision](../../../.agents/notes/implemented/bug-fix/2026-08-20-running-draft-primary-send.md)).
++
++The optional `conversation.input.fileDrop` seat receives the owning `dropRegionId`, current admission state, validated `onAddImages` callback and localized invitation labels from InputBar. Native drag routing and overlay presentation belong to its occupant; the independent attachment seat receives only draft images and removal actions.
+ 
+ <a id="temporary-composer-entries"></a>
+ ## Temporary composer entries
+--- a/packages/client/ui-conversation/README.zh.md
++++ b/packages/client/ui-conversation/README.zh.md
+@@ -43,6 +43,8 @@
+ 默认发送采用乐观提交：Enter 在同一事务里清空草稿、occurrence 表和撤销历史，composer 保持 `plain`，发送作为 detached attempt 运行，发送期间可以继续输入和提交。`sendSession` 在序列化之前注册 Session 提交回显（`session.beginSubmission`），让出一帧使回显在点击当帧渲染，图片经浏览器原生 `FileReader` data-URL 路径编码。多个并发发送失败时，在用户编辑还原内容之前按提交顺序合并还原；命令提交保持冻结的 `submitting` 阶段。Detached attempt 持有图片 id，直到 admission 完成或 Session scope 销毁。回显以 observed 退休时，durable 图片缓存立即公开预览 URL，同时读取 admitted 附件，随后用规范化 URL 替换预览，并在两个 URL 各自停止使用后撤销。直接 subagent continuation 不创建本地回显，因为其 transport 不保留浏览器 request id。
+ 
+ 普通 composer 运行时，如果草稿为空或输入不可用，主指针操作保持为 Stop。可提交的文字或附件会把同一位置切换为 Queue Send；清空或成功提交草稿后恢复 Stop。繁忙态 Enter 设置继续选择 Queue 或 Steer 键盘操作。可继续 subagent 保留独立的 Send 与 Stop 操作（[决策](../../../.agents/notes/implemented/bug-fix/2026-08-20-running-draft-primary-send.zh.md)）。
++
++可选的 `conversation.input.fileDrop` 槽位从 InputBar 接收所属 `dropRegionId`、当前接收状态、经过校验路径的 `onAddImages` 回调和本地化邀请文案。原生拖拽路由与遮罩呈现属于槽位实现；独立的附件槽位只接收草稿图片与移除操作。
+ 
+ <a id="temporary-composer-entries"></a>
+ ## 临时 composer entry
+--- a/packages/client/ui-conversation/src/client/apply.ts
++++ b/packages/client/ui-conversation/src/client/apply.ts
+@@ -247,6 +247,7 @@
+     locale: NS,
+     children: {
+       'conversation.input.attachments': { kind: 'single', scope: 'session-maybe' },
++      'conversation.input.fileDrop': { kind: 'single', scope: 'session-maybe' },
+       'conversation.input.plan': { kind: 'single', scope: 'session' },
+       'conversation.input.model': { kind: 'single', scope: 'session' },
+     },
+--- a/packages/client/ui-conversation/src/client/contract/slots.ts
++++ b/packages/client/ui-conversation/src/client/contract/slots.ts
+@@ -38,14 +38,20 @@
+ export interface ComposerAttachmentsOwnerProps {
+   /** Browser-owned draft images in input order. */
+   attachments: readonly ComposerAttachment[]
+-  /** Whether a document-level file drop may add images now. */
+-  canAcceptDrop: boolean
+-  /** Add one dropped batch through the composer's validation path. */
+-  onAddImages: (files: readonly File[]) => void
+   /** Remove one draft image through the Conversation service. */
+   onRemoveImage: (id: DraftAttachmentId) => void
+-  /** Display-ready limits for the drop invitation. */
+-  dropLimits?: { readonly count: number; readonly size: string } | undefined
++}
++
++/** Conversation-owned image intake for an optional native file-drop adapter. */
++export interface ComposerFileDropOwnerProps {
++  /** Conversation root element to register; absent when no region is supplied. */
++  dropRegionId?: string | undefined
++  /** Whether this composer currently admits dropped images. */
++  canAcceptDrop: boolean
++  /** Add a batch through the composer's image validation and notice path. */
++  onAddImages: (files: readonly File[]) => void
++  /** Localized invitation or refusal with optional image-limit text. */
++  labels: { readonly title: string; readonly desc?: string | undefined }
+ }
+ 
+ /**
+@@ -143,11 +149,17 @@
+     'conversation.input.right': { kind: 'list'; scope: 'session'; owner: InputZone }
+     /** Resident composer body, including the no-Session inert state. */
+     'conversation.composer.bar': { kind: 'single'; scope: 'session-maybe'; owner: ComposerBarOwnerProps }
+-    /** Optional draft-image rail and drop target. */
++    /** Optional draft-image rail and preview. */
+     'conversation.input.attachments': {
+       kind: 'single'
+       scope: 'session-maybe'
+       owner: ComposerAttachmentsOwnerProps
++    }
++    /** Optional native file-drop intake for the owning conversation region. */
++    'conversation.input.fileDrop': {
++      kind: 'single'
++      scope: 'session-maybe'
++      owner: ComposerFileDropOwnerProps
+     }
+     /** Plan control inside the composer tool row. */
+     'conversation.input.plan': { kind: 'single'; scope: 'session'; owner: InputControlOwnerProps }
+@@ -275,6 +287,8 @@
+   rightItems?: ReactNode
+   /** Ambient content below the card. */
+   footer?: ReactNode
++  /** Conversation root element that owns file drag/drop. */
++  dropRegionId?: string | undefined
+ }
+ 
+ /** Package-private operations injected into the resident composer bar. */
+@@ -308,7 +322,8 @@
+ export type ComposerBarProps =
+   PropsRuntime<'conversation.composer.bar'>
+   & PropsRenderSlots<
+-    'conversation.input.attachments' | 'conversation.input.plan' | 'conversation.input.model'
++    'conversation.input.attachments' | 'conversation.input.fileDrop'
++    | 'conversation.input.plan' | 'conversation.input.model'
+   >
+   & InjectFace<ComposerBarInjected>
+   & PropsLocale<'conversation'>
+@@ -376,6 +391,9 @@
+ export type ComposerAttachmentsProps =
+   PropsRuntime<'conversation.input.attachments'> & PropsLocale<'conversation'>
+ 
++/** Full props of the optional native file-drop adapter. */
++export type ComposerFileDropProps = PropsRuntime<'conversation.input.fileDrop'>
++
+ /** Owner share common to blank-session Workspace pickers. */
+ export interface EmptyWorkspaceOwnerProps {
+   open: boolean
+--- a/packages/client/ui-conversation/src/client/index.ts
++++ b/packages/client/ui-conversation/src/client/index.ts
+@@ -47,6 +47,7 @@
+ export type { ConversationKey } from './locales.ts'
+ export type {
+   ComposerAttachment, ComposerAttachmentsOwnerProps, ComposerAttachmentsProps,
++  ComposerFileDropOwnerProps, ComposerFileDropProps,
+   ComposerBarInjected, ComposerBarOwnerProps, ComposerBarProps, ComposerChainProps,
+   ConversationHeaderActionOwnerProps, ConversationHeaderLineageOwnerProps,
+   ConversationInjected, ConversationSessionHeaderInjected, ConversationSessionHeaderSlotProps,
+--- a/packages/client/ui-conversation/src/client/skeleton/ConversationRoot.tsx
++++ b/packages/client/ui-conversation/src/client/skeleton/ConversationRoot.tsx
+@@ -2,7 +2,7 @@
+ // chain, AND the composer bar (session-maybe slot) stay mounted across
+ // no-session/session transitions — the bar renders inert via owner props.
+ 
+-import { useCallback, useEffect, useRef, useState } from 'react'
++import { useCallback, useEffect, useId, useRef, useState } from 'react'
+ import clsx from 'clsx'
+ import type { WorkspaceId } from '@deepseek-ai/dsh-workspace/types'
+ import type { ConversationSlotProps, InputZone } from '../contract/slots.ts'
+@@ -133,6 +133,7 @@
+   useWorkspaces, useConversation, useInput, useComposerBlock,
+   renderSlot, renderSlotChain, selectWorkspace, t,
+ }: ConversationRootProps) {
++  const dropRegionId = useId()
+   const session = useSession(s => s)
+   const pendingInteraction = useSessionPendingInteraction(snapshot =>
+     sessionId === undefined ? undefined : snapshot.get(sessionId))
+@@ -349,6 +350,7 @@
+     rightItems: zone === undefined ? null : renderSlot('conversation.input.right', zone),
+     // Ambient dock under the card shares the composer's width constraint.
+     footer: !hero && zone !== undefined ? renderSlot('conversation.composer.dock', zone) : null,
++    dropRegionId,
+   })
+ 
+   const composerBar = (
+@@ -378,7 +380,7 @@
+   )
+ 
+   return (
+-    <div ref={rootResizeRef} className={css.root} data-phase={phase}>
++    <div id={dropRegionId} ref={rootResizeRef} className={css.root} data-phase={phase}>
+       {sessionId === undefined ? null : renderSlot('conversation.session.header', {})}
+       <div className={css.body}>
+         <div className={css.scrollBody} data-conversation-scroll="">
+--- a/packages/client/ui-conversation/src/client/skeleton/InputBar.tsx
++++ b/packages/client/ui-conversation/src/client/skeleton/InputBar.tsx
+@@ -46,6 +46,7 @@
+   useProjection, sessionId, variant, disabled: inert = false, blocked,
+   workspacePickerOpen = false, onRequestWorkspace,
+   placeholder, accessory, overlay, leftItems, rightItems, footer,
++  dropRegionId,
+ }: InputBarProps) {
+   const input = useInput(s => s)
+   const notice = useNotices(s => s)
+@@ -395,12 +396,18 @@
+         {accessory !== undefined && <div className={css.accessory}>{accessory}</div>}
+         {renderSlot('conversation.input.attachments', {
+           attachments,
++          onRemoveImage: (id) => { removeImage?.(id) },
++        })}
++        {renderSlot('conversation.input.fileDrop', {
++          dropRegionId,
+           canAcceptDrop,
+           onAddImages: intakeImages,
+-          onRemoveImage: (id) => { removeImage?.(id) },
+-          dropLimits: imageLimits === undefined ? undefined : {
+-            count: imageLimits.maxImagesPerMessage,
+-            size: imageSizeText(imageLimits.maxImageBytes),
++          labels: {
++            title: t(canAcceptDrop ? 'image.dropTitle' : 'image.dropBlocked'),
++            desc: !canAcceptDrop || imageLimits === undefined ? undefined : t('image.dropDesc', {
++              count: imageLimits.maxImagesPerMessage,
++              size: imageSizeText(imageLimits.maxImageBytes),
++            }),
+           },
+         })}
+         {/* One scrollport, one text surface: the contenteditable grows with
+--- a/packages/client/ui-conversation/tests/input-bar.client.spec.tsx
++++ b/packages/client/ui-conversation/tests/input-bar.client.spec.tsx
+@@ -24,7 +24,7 @@
+ import { SessionInputShell } from '../src/client/input/facade.ts'
+ import { $replaceDetectSpanWithText, $selectDetectSpan } from '../src/client/input/editor/span-map.ts'
+ import type {
+-  ComposerAttachment, ComposerAttachmentsOwnerProps,
++  ComposerAttachment, ComposerAttachmentsOwnerProps, ComposerFileDropOwnerProps,
+ } from '../src/client/contract/slots.ts'
+ import type { DraftAttachmentId } from '../src/client/contract/input.ts'
+ import { InputBar } from '../src/client/skeleton/InputBar.tsx'
+@@ -226,6 +226,12 @@
+   throw new Error('attachment slot was not rendered')
+ }
+ 
++function fileDropOwner(slotCalls: readonly { key: string; owner: unknown }[]): ComposerFileDropOwnerProps {
++  const call = slotCalls.findLast(call => call.key === 'conversation.input.fileDrop')
++  if (call === undefined) throw new Error('file-drop slot was not rendered')
++  return call.owner as ComposerFileDropOwnerProps
++}
++
+ /** The state's placeholder copy (the textarea.placeholder equivalent; the visible layer renders it only while empty). */
+ function placeholderOf(container: HTMLElement): string {
+   return container.querySelector('[data-composer-input]')?.getAttribute('data-placeholder') ?? ''
+@@ -271,7 +277,7 @@
+     }
+     const png = (bytes: number, name: string) => new File([new ArrayBuffer(bytes)], name, { type: 'image/png' })
+     const intake = (result: ReturnType<typeof bench>, files: File[]) => {
+-      act(() => { attachmentOwner(result.slotCalls).onAddImages(files) })
++      act(() => { fileDropOwner(result.slotCalls).onAddImages(files) })
+     }
+     // Count: three at once over a two-image limit → the whole batch refused.
+     const overCount = bench({ addImages: vi.fn(() => null), imageLimits: limits })
+@@ -319,12 +325,12 @@
+       new File([new ArrayBuffer(64)], 'a.pdf', { type: 'application/pdf' }),
+       new File([new ArrayBuffer(64)], 'b.pdf', { type: 'application/pdf' }),
+     ]
+-    act(() => { attachmentOwner(result.slotCalls).onAddImages(files) })
++    act(() => { fileDropOwner(result.slotCalls).onAddImages(files) })
+     expect(addImages).toHaveBeenCalledWith(files)
+     expect(result.view.getByRole('alert').textContent).toContain('仅支持 PNG、JPG、WebP、GIF 格式的图片')
+   })
+ 
+-  it('projects display-ready limits into the attachment slot', () => {
++  it('projects localized limits into the file-drop slot', () => {
+     const result = bench({
+       addImages: vi.fn(() => null),
+       imageLimits: {
+@@ -336,7 +342,7 @@
+         mediaTypes: ['image/png'] as const,
+       },
+     })
+-    expect(attachmentOwner(result.slotCalls).dropLimits).toEqual({ count: 20, size: '5MB' })
++    expect(fileDropOwner(result.slotCalls).labels).toEqual({ title: '图片拖动到此处即可添加', desc: '最多 20 张，每张 5MB' })
+   })
+ 
+   it('announces server attachment rejections as product copy, other codes as developer text', () => {
+@@ -368,9 +374,9 @@
+     expect(other.view.getByRole('alert').textContent).toContain('boom (gateway/internal)')
+   })
+ 
+-  it('marks the attachment slot unavailable while the composer is locked', () => {
++  it('marks the file-drop slot unavailable while the composer is locked', () => {
+     const result = bench({ addImages: vi.fn(() => null), inert: true })
+-    expect(attachmentOwner(result.slotCalls).canAcceptDrop).toBe(false)
++    expect(fileDropOwner(result.slotCalls).canAcceptDrop).toBe(false)
+   })
+ 
+   it('sends an image-only draft and exposes removal through the attachment slot', async () => {
+@@ -439,11 +445,11 @@
+     }
+   })
+ 
+-  it('announces a rejected attachment-slot intake through the same toast', () => {
++  it('announces a rejected file-drop intake through the same toast', () => {
+     const addImages = vi.fn(() => '图片读取服务不可用')
+     const result = bench({ addImages })
+     act(() => {
+-      attachmentOwner(result.slotCalls).onAddImages([
++      fileDropOwner(result.slotCalls).onAddImages([
+         new File([Uint8Array.of(1)], 'x.png', { type: 'image/png' }),
+       ])
+     })
+@@ -1300,7 +1306,7 @@
+     // Every seat dispatched, nothing rendered (render passes may repeat; the
+     // seat set is the contract).
+     expect([...new Set(slotCalls.map(c => c.key))]).toEqual([
+-      'conversation.input.attachments', 'conversation.input.plan', 'conversation.input.model',
++      'conversation.input.attachments', 'conversation.input.fileDrop', 'conversation.input.plan', 'conversation.input.model',
+     ])
+     expect(view.queryByLabelText('Plan mode')).toBeNull()
+     expect(view.queryByLabelText('Model')).toBeNull()
+@@ -1466,14 +1472,14 @@
+     expect(view.getByTestId('plan-entry')).toBeTruthy()
+     expect(view.getByTestId('model-entry')).toBeTruthy()
+     // The bar hands its chrome disable state to the filling entry.
+-    const controls = slotCalls.filter(call => call.key !== 'conversation.input.attachments')
++    const controls = slotCalls.filter(call => call.key === 'conversation.input.plan' || call.key === 'conversation.input.model')
+     expect(controls.every(c => (c.owner as { locked: boolean }).locked)).toBe(true)
+-    expect(attachmentOwner(slotCalls).canAcceptDrop).toBe(false)
++    expect(fileDropOwner(slotCalls).canAcceptDrop).toBe(false)
+     cleanup()
+     const live = bench({ running: true })
+-    const liveControls = live.slotCalls.filter(call => call.key !== 'conversation.input.attachments')
++    const liveControls = live.slotCalls.filter(call => call.key === 'conversation.input.plan' || call.key === 'conversation.input.model')
+     expect(liveControls.every(c => !(c.owner as { locked: boolean }).locked)).toBe(true)
+-    expect(attachmentOwner(live.slotCalls).canAcceptDrop).toBe(true)
++    expect(fileDropOwner(live.slotCalls).canAcceptDrop).toBe(true)
+   })
+ 
+   it('disabled locks the Access chip and command launcher (running does not)', () => {
