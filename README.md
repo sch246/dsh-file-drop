@@ -22,7 +22,6 @@ Read [STATE](.intent/state/STATE.md) for installation, Host adaptation and remov
 
 ```sh
 DSH_CHECKOUT=/absolute/candidate/harness bash scripts/build.sh
-DSH_CHECKOUT=/absolute/candidate/harness bash scripts/test.sh
 DSH_CHECKOUT=/absolute/candidate/harness DSH_HOME=/absolute/private/home DSH_PROFILE=web bash scripts/setup.sh
 ```
 
